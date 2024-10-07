@@ -43,8 +43,8 @@ The first line of input will initialize the Bloom filter size and hash functions
 
 After the Facebook clone server sends a valid input, it can interact with the menu by entering an option number (1 or 2) along with a URL:
 
-- **Option 1**: Add the URL to the list of blacklisted URLs.
-- **Option 2**: Check whether the URL is already in the list of blacklisted URLs.
+- **Option 1**: Add the URL to the list of blacklisted URLs. For instance, entering `1 www.example.com` will add this URL to the blacklist.
+- **Option 2**: Check whether the URL is already in the list of blacklisted URLs. For example, entering `2 www.example.com` will verify if this URL is blacklisted.
 
 
 
