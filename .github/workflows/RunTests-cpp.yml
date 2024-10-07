@@ -1,0 +1,33 @@
+# This workflow will run all the tests from step 2 for every pull request into the main branch
+
+name:  Run Tests on Pull Request
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up build environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install build-essential cmake libgtest-dev
+
+
+    - name: configure
+      run: cmake .
+
+    - name: Build
+      run: |
+       make
+       ls -la tests  
+      
+        
+    - name: Run tests
+      run: ./BloomFilterTests

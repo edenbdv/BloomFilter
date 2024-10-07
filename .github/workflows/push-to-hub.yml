@@ -1,0 +1,22 @@
+name: Publish Docker image
+on:
+  release:
+    types: [published]
+jobs:
+  push_to_registry:
+    name: Push Docker image to Docker Hub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+        with:
+          ref: ex4_main  # Checkout the code from the ex4_main branch
+      - name: Set image tag based on commit hash
+        id: meta
+        run: echo "tags=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+      - name: Log in to Docker Hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build and tag Docker image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/bloom_filter:${{ env.tags }} .
+      - name: Push Docker image
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/bloom_filter:${{ env.tags }}
