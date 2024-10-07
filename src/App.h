@@ -29,6 +29,9 @@ public:
 
     BloomFilter* Initializebf(int client_sock, const std::string& initialInput);
 
+
+    //InitializeHashes function processes a string of space-separated integers,
+     //converts them to indices, and selects hash functions from the hashFunctions vector based on those indices//
     std::vector<IHash*> InitializeHashes(const std::string& restOfInput);
 
     std::string handleClient(int client_sock);

@@ -18,7 +18,8 @@ To compile the project, follow these steps:
 git clone https://github.com/edenbdv/BloomFilter.git
 cd BloomFilter
 cd src
-g++ -o main.exe Main.cpp BloomFilter.cpp App.cpp Menu.cpp IHash.h ICommand.h Hashs/StdHash.cpp Hashs/DoubleStdHash.cpp Commands/AddUrlCommand.cpp Commands/ContainsUrlCommand.cpp
+g++ -o main.exe Main.cpp BloomFilter.cpp App.cpp Menu.cpp IHash.h ICommand.h Hashs/StdHash.cpp Hashs/DoubleStdHash.cpp Commands/AddUrlCommand.cpp Commands/ContainsUrlCommand.cpp -pthread
+
 ```
 *don't forget to adjust your CMakeLists file before the last step
 
@@ -30,7 +31,22 @@ Once the project is compiled, you can run the executable to interact with the Bl
 ./main.exe
 ```
 
-The first line of input will be initializing the bloomfilter size and hash functions, adter entering a valid input you can interact with the menu by entering an option number (1 or2) and a URL.
+## Bloom Filter Input Instructions
+
+The first line of input will initialize the Bloom filter size and hash functions. The input will be sent by the Facebook clone server as part of its operation. However, this Bloom filter can be utilized by any server, not just my Facebook-clone server. Below are examples of valid input formats:
+
+- If the first line of input is `100 1`, this means the Bloom filter will have an array of size 100 bits and will utilize only one hash function, which is the built-in `std::hash`.
+
+- If the input is `128 2`, this indicates that the Bloom filter has an array of size 128 bits, and one of the hash functions will perform `std::hash` twice.
+
+- If the input is `256 2 1`, this specifies the use of two hash functions: one performing `std::hash` and the other performing `std::hash` twice.
+
+After the Facebook clone server sends a valid input, it can interact with the menu by entering an option number (1 or 2) along with a URL:
+
+- **Option 1**: Add the URL to the list of blacklisted URLs.
+- **Option 2**: Check whether the URL is already in the list of blacklisted URLs.
+
+
 
 ## Running the Tests
 write these commands in the terminal:
