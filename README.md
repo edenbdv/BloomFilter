@@ -1,4 +1,4 @@
-# BloomFilter Project
+# BloomFilter Server 
 
 First step in final project in Advanced Programming course BIU 2024
 
