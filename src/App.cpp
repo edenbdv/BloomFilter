@@ -38,6 +38,8 @@ App::App() : bf(nullptr), menu(new Menu()),blacklist(new std::vector<std::string
 
 std::string App::receiveData(int client_sock)
 {
+    std::cout << "Entering function: " << __FUNCTION__ << std::endl;
+
     char buffer[4096];
     memset(buffer, 0, sizeof(buffer)); // Clear the buffer before receiving data
 
@@ -62,31 +64,9 @@ std::string App::receiveData(int client_sock)
 }
 
 
-int App::initializeClient(int client_sock) {
-
-    // Receive initial data from the client
-    std::string initialInput = receiveData(client_sock);
-    if (initialInput.empty())
-    {
-        // Error or connection closed by client
-        return -1;
-    }
-
-
-    // Process the initial data
-    this->bf = Initializebf(client_sock, initialInput);
-
-   // Send a special string back to the client to indicate success
-    std::string successMessage = "SUCCESS";
-    send(client_sock, successMessage.c_str(), successMessage.size(), 0);
-
-
-
-    handleMenu(client_sock);
-}
-
-
 std::string App::handleMenu(int client_sock) {
+        std::cout << "Entering function: " << __FUNCTION__ << std::endl;
+
     std::vector<std::string> words;
     //std::vector<std::string> blacklist;
 
@@ -154,7 +134,16 @@ std::string App::handleMenu(int client_sock) {
 }
 
 void App::run()
-{
+{  
+    std::cout << "Entering function: " << __FUNCTION__ << std::endl;
+
+    bf = Initializebf(); 
+
+    if (!bf)
+    {
+        std::cerr << "Failed to initialize Bloom filter." << std::endl;
+        return;
+    }
 
     // create socket for server
     const int server_port = 5555;
@@ -174,122 +163,60 @@ void App::run()
     if (bind(sock, (struct sockaddr *)&sin, sizeof(sin)) < 0)
     {
         perror("error binding socket");
+        close(sock);
         return;
     }
 
     if (listen(sock, 5) < 0)
     {
         perror("error listening to a socket");
+        close(sock);
         return;
     }
 
-    bool initialized = false;
-    int client_sock;
     while (true)
     {
         struct sockaddr_in client_sin;
         unsigned int addr_len = sizeof(client_sin);
-
-
-         if (!initialized) {
-            // Accept a connection for initialization
-            client_sock = accept(sock, (struct sockaddr *)&client_sin, &addr_len);
-            if (client_sock < 0)
-            {
-                perror("Error accepting client");
-                close(sock);
-                return;
-            }
-
-            initializeClient(client_sock);
-
-       
-            initialized = true;
-         } else {
-            // Accept subsequent client connections after initialization
-            client_sock = accept(sock, (struct sockaddr *)&client_sin, &addr_len);
-            if (client_sock < 0)
-            {
-                perror("Error accepting client");
-                continue;
-            }
+        int client_sock = accept(sock, (struct sockaddr *)&client_sin, &addr_len);
+         if (client_sock < 0)
+        {
+            perror("Error accepting client connection");
+            continue;
+        }
 
             // Start a new thread for handling client requests
             std::thread client_thread(&App::handleMenu, this, client_sock);
             client_thread.detach();
         }
-
-
-        
-    }
     close(sock);
 }
 
 
+BloomFilter* App::Initializebf()
+{   std::cout << "Entering function: " << __FUNCTION__ << std::endl;
+
+    int size = 8;  // Define Bloom filter size
+    std::vector<IHash*> hashes = {new StdHash(), new DoubleStdHash()};  // Use default hash functions
+    BloomFilter* bloomFilter = new BloomFilter(size, hashes, commands);
 
 
-BloomFilter *App::Initializebf(int client_sock, const std::string& initialInput)
-{
-    BloomFilter *bf = nullptr;
-    int size;
-    std::vector<IHash *> hashes;
+    //list of URLs to be added to the Bloom Filter
+    std::vector<std::string> urls = {
+        "http://example.com",
+        "https://warning.com",
+        "http://danger.il",
+      
+    };
 
-    std::istringstream iss(initialInput);
-
-
-    while (true)
+     // Add each URL to the Bloom Filter using AddUrlCommand
+    for (const auto& url : urls)
     {
-
-        // Read the first word as size
-        if ((iss >> size) && size > 0)
-        {
-
-            // Read the rest of the line
-            std::string restOfInput;
-            std::getline(iss, restOfInput);
-
-            // Pass the rest of the input
-            hashes = InitializeHashes(restOfInput);
-
-            // if hahses is not empty it means there was a valid input
-            if (!hashes.empty())
-            {   
-
-                bf = new BloomFilter(size, hashes, commands);
-
-               
-                break;
-            }
-            // if first word of input cannot be converted to int
-        }
-      else
-            {
-                 // Invalid hash functions received from client
-                // Send error message to client
-                std::string errorMessage = "INVALID_INPUT";
-                send(client_sock, errorMessage.c_str(), errorMessage.size(), 0);
-            }
-       
-
-        // Receive input from the client socket
-        std::string newInput = receiveData(client_sock);
-        if (newInput.empty())
-        {
-            // Error or connection closed by client
-            std::cerr << "Error: Empty input received from client." << std::endl;
-            break;
-        }
-
-
-        // Update the input stream with the new input
-        iss.clear(); // Clear any error flags
-        iss.str(newInput); // Set the new input as the content of the stream
-
-
-
+        // Execute the AddUrlCommand for each URL in the list
+        std::string isin = commands["1"]->execute(url, *bloomFilter, *blacklist);
     }
 
-    return bf;
+    return bloomFilter;
 }
 
 std::vector<IHash *> App::InitializeHashes(const std::string &restOfInput)

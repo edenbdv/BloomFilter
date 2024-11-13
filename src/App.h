@@ -27,7 +27,7 @@ public:
 
     void run();
 
-    BloomFilter* Initializebf(int client_sock, const std::string& initialInput);
+    BloomFilter* Initializebf();
 
 
     //InitializeHashes function processes a string of space-separated integers,
@@ -38,20 +38,11 @@ public:
 
     std::string receiveData(int client_sock);
 
-    //std::string initializeClient(int client_sock);
-
-    int initializeClient(int client_sock);
-
     std::string handleMenu(int client_sock);
-
 
     ~App();
 
-    //BloomFilter* getBloomFilter();
-
-    //std::map<std::string, ICommand*> getCommands() const;
-
-    //std::vector<IHash*> getHashFunctions() const;
+ 
 };
 
 #endif // APP_H
