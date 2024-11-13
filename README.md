@@ -1,4 +1,4 @@
-# BloomFilter Project
+# BloomFilter Server 
 
 First step in final project in Advanced Programming course BIU 2024
 
@@ -9,6 +9,15 @@ wiki: https://github.com/edenbdv/Facebook_clone-Server.git
 This project implements a Bloom Filter, a space-efficient probabilistic data structure used to test whether a given url is a member of a set. It is written in C++ and includes functionalities like adding URLs to the filter, checking if a URL is present, and handling false positives.
 
 This Bloom Filter is used in the Facebook Clone project to prevent users from creating posts with forbidden URLs, improving security by blocking access to restricted or harmful content.
+By default for example, in the Facebook Clone there is a blacklist containing three URLs: ['http://example.com', 'https://warning.com', 'http://danger]
+
+
+![image](https://github.com/user-attachments/assets/7525be06-a386-4cfa-ba91-df63d207130e)
+
+
+
+![image](https://github.com/user-attachments/assets/6231f1c6-02b7-4311-b084-4ed1e5d62a32)
+
 
 ## Compilation
 

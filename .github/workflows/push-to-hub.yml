@@ -10,7 +10,7 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v4
         with:
-          ref: ex4_main  # Checkout the code from the ex4_main branch
+          ref: main  # Checkout the code from the main branch
       - name: Set image tag based on commit hash
         id: meta
         run: echo "tags=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
